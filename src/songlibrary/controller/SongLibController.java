@@ -8,15 +8,19 @@ import javafx.scene.layout.VBox;
 
 public class SongLibController {
 
+	// buttons
     @FXML private Button addButton;
     @FXML private Button deleteButton;
     @FXML private Button editButton;
     
-    @FXML private Label albumLabel;
-    @FXML private Label artistLabel;
+    // labels
+    @FXML private Label albumLabel;			// required
+    @FXML private Label artistLabel;		// required
+    @FXML private Label releasedateLabel;	// "unknown" if not set
+    @FXML private Label titleLabel;			// "unknown" if not set
+    
+    // song list element
     @FXML private VBox list;
-    @FXML private Label releasedateLabel;
-    @FXML private Label titleLabel;
 
     @FXML
     void addSong(ActionEvent event) {
