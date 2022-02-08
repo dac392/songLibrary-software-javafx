@@ -27,5 +27,13 @@
 	-fx-background-color: #eee;
 }
 
+#modalCard{
+	-fx-background-color: #fff;
+}
+#modal-bg{
+	-fx-background-color: rgba(0, 0, 0, 0.5);
+
+}
+
 
 

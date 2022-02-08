@@ -23,7 +23,7 @@ public class SongLib extends Application{
 			Scene scene = new Scene(root);
 			
 			primaryStage.setScene(scene);
-//			primaryStage.setFullScreen(true);
+			
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
