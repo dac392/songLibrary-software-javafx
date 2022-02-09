@@ -7,6 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class SongLibController {
 
@@ -52,14 +54,26 @@ public class SongLibController {
     
     @FXML
     void submit(ActionEvent event) {
+    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty())
+    	{
+    		Alert alert = new Alert(AlertType.INFORMATION);
+    		alert.setTitle("ERROR!");
+    		alert.setHeaderText("YOU FUCKED UP!");
+    		alert.setContentText("You're missing stuff!");
+    		alert.showAndWait();
+    	}
+    	else {    	
     	Song test = new Song(titleText.getText(), artistText.getText(), albumText.getText(), Integer.parseInt(yearText.getText()));
-    	modalContainer.setVisible(false);
-    	modalContainer.setOpacity(0);
+    	
+
     	
     	System.out.println(test.getTitle());
     	System.out.println(test.getArtist());
     	System.out.println(test.getAlbum());
     	System.out.println(test.getYear());
+    	modalContainer.setVisible(false);
+    	modalContainer.setOpacity(0);
+    	}
     }
     
     @FXML
