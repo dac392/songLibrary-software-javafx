@@ -9,6 +9,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
 
 public class SongLibController {
 
@@ -34,8 +38,14 @@ public class SongLibController {
     // elements
     @FXML private VBox list;
     @FXML private GridPane modalContainer;
-
+    
+    @FXML private ListView songsList;
+    private ObservableList<String> obsList = FXCollections.observableArrayList(); 
+   
+    
     @FXML
+    
+    
     void addSong(ActionEvent event) {
     	System.out.println("added a song");
     	showModalView(event);
@@ -71,6 +81,9 @@ public class SongLibController {
     	System.out.println(test.getArtist());
     	System.out.println(test.getAlbum());
     	System.out.println(test.getYear());
+    	
+    	obsList.add(test.getTitle()+"\t"+test.getArtist()+"\t"+test.getAlbum()+"\t"+test.getYear());
+    	songsList.setItems(obsList);
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
     	}
@@ -88,5 +101,7 @@ public class SongLibController {
     	modalContainer.setVisible(true);
     	modalContainer.setOpacity(1);
     }
+    
+
 
 }

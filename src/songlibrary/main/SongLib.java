@@ -20,6 +20,7 @@ public class SongLib extends Application{
 			loader.setLocation(getClass().getResource("/songlibrary/views/SongLibrary.fxml"));
 			
 			AnchorPane root = (AnchorPane)loader.load();
+		
 			Scene scene = new Scene(root);
 			
 			primaryStage.setScene(scene);
