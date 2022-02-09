@@ -58,8 +58,8 @@ public class SongLibController {
     	{
     		Alert alert = new Alert(AlertType.INFORMATION);
     		alert.setTitle("ERROR!");
-    		alert.setHeaderText("YOU FUCKED UP!");
-    		alert.setContentText("You're missing stuff!");
+    		alert.setHeaderText("Missing Title/Artist");
+    		alert.setContentText("To add a song, please input the required fields.");
     		alert.showAndWait();
     	}
     	else {    	
