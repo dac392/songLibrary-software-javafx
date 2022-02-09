@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
@@ -15,6 +16,12 @@ public class SongLibController {
     @FXML private Button editButton;
     @FXML private Button exitModalBtn;
     @FXML private Button submitBtn;
+    
+    //TextFields
+    @FXML private TextField titleText;
+    @FXML private TextField artistText;
+    @FXML private TextField albumText;
+    @FXML private TextField yearText;
     
     // labels
     @FXML private Label albumLabel;			// required
@@ -45,7 +52,14 @@ public class SongLibController {
     
     @FXML
     void submit(ActionEvent event) {
-
+    	Song test = new Song(titleText.getText(), artistText.getText(), albumText.getText(), Integer.parseInt(yearText.getText()));
+    	modalContainer.setVisible(false);
+    	modalContainer.setOpacity(0);
+    	
+    	System.out.println(test.getTitle());
+    	System.out.println(test.getArtist());
+    	System.out.println(test.getAlbum());
+    	System.out.println(test.getYear());
     }
     
     @FXML
