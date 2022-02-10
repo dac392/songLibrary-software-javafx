@@ -4,8 +4,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
 
 public class SongLibController {
 
@@ -16,6 +23,12 @@ public class SongLibController {
     @FXML private Button exitModalBtn;
     @FXML private Button submitBtn;
     
+    //TextFields
+    @FXML private TextField titleText;
+    @FXML private TextField artistText;
+    @FXML private TextField albumText;
+    @FXML private TextField yearText;
+    
     // labels
     @FXML private Label albumLabel;			// required
     @FXML private Label artistLabel;		// required
@@ -25,8 +38,14 @@ public class SongLibController {
     // elements
     @FXML private VBox list;
     @FXML private GridPane modalContainer;
-
+    
+    @FXML private ListView songsList;
+    private ObservableList<String> obsList = FXCollections.observableArrayList(); 
+   
+    
     @FXML
+    
+    
     void addSong(ActionEvent event) {
     	System.out.println("added a song");
     	showModalView(event);
@@ -45,7 +64,29 @@ public class SongLibController {
     
     @FXML
     void submit(ActionEvent event) {
+    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty())
+    	{
+    		Alert alert = new Alert(AlertType.INFORMATION);
+    		alert.setTitle("ERROR!");
+    		alert.setHeaderText("Missing Title/Artist");
+    		alert.setContentText("To add a song, please input the required fields.");
+    		alert.showAndWait();
+    	}
+    	else {    	
+    	Song test = new Song(titleText.getText(), artistText.getText(), albumText.getText(), Integer.parseInt(yearText.getText()));
+    	
 
+    	
+    	System.out.println(test.getTitle());
+    	System.out.println(test.getArtist());
+    	System.out.println(test.getAlbum());
+    	System.out.println(test.getYear());
+    	
+    	obsList.add(test.getTitle()+"\t"+test.getArtist()+"\t"+test.getAlbum()+"\t"+test.getYear());
+    	songsList.setItems(obsList);
+    	modalContainer.setVisible(false);
+    	modalContainer.setOpacity(0);
+    	}
     }
     
     @FXML
@@ -60,5 +101,7 @@ public class SongLibController {
     	modalContainer.setVisible(true);
     	modalContainer.setOpacity(1);
     }
+    
+
 
 }
