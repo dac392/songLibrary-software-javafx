@@ -5,13 +5,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.collections.ObservableList;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Optional;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import javafx.collections.FXCollections;
 
 public class SongLibController {
@@ -39,69 +49,145 @@ public class SongLibController {
     @FXML private VBox list;
     @FXML private GridPane modalContainer;
     
-    @FXML private ListView songsList;
+    @FXML private ListView<String> songsList;
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
+    private JSONArray data;
    
     
-    @FXML
+    public void start(Stage mainStage) {
+    	
+    	
+		try {
+			String location = "src/songlibrary/controller/listData.json";
+			String jsonString = new String(Files.readAllBytes(Paths.get(location)));
+			JSONObject parser = new JSONObject(jsonString);
+			data = parser.getJSONArray("songs");
+	    	
+	    	System.out.println(data.toString());
+	    	
+	    	songsList		
+	    	.getSelectionModel()
+			.selectedIndexProperty()
+			.addListener( (obs, oldVal, newVal) -> select(mainStage));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Sorry, this is not a valid location");
+			e.printStackTrace();
+			
+		}
+
+    }
     
-    
-    void addSong(ActionEvent event) {
-    	System.out.println("added a song");
-    	showModalView(event);
+    private void addSong(Optional<String[]> songInfo) {
+
+    	if(songInfo.isPresent()) {
+    		Song song = new Song(songInfo.get(), obsList.size());
+    		if(song.canBeAdded(obsList)) {
+    			obsList.add(song.toString());
+    			obsList.sort(null);
+    			songsList.setItems(obsList);
+        		exitModalView();
+            	formCleanUp();
+            	
+        		int newIndex = obsList.indexOf(song.toString());
+        		song.setListIndex(newIndex);
+        		songsList.getSelectionModel().select(newIndex);
+        		
+        		//wrong
+//        		data.put(song);
+//        		System.out.println(data.toString());
+        		
+        		
+
+    		}else {
+    			showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
+        	}
+    		
+
+    	}
+    	
+    	
     }
 
-    @FXML
-    void deleteSong(ActionEvent event) {
+
+	@FXML void deleteSong(ActionEvent event) {
     	System.out.println("deleted a song");
     }
 
     @FXML
     void editSong(ActionEvent event) {
     	System.out.println("edited a song");
-    	showModalView(event);
+    	showModalView();
+    }
+    
+    @FXML void submit(ActionEvent event) {
+    	
+    	Optional<String[]> songInformation = Optional.empty();
+    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty()){
+    		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
+    	}else {
+    		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
+    		songInformation = Optional.of(newSongInfo);
+    	}
+    	
+    	addSong(songInformation);
+    	
+    }
+    
+    
+    
+  //Helper Functions:
+
+
+    
+    private void showAlert(String title, String header, String content) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+		
+	}
+    
+	@FXML
+    void exitModalView() {
+    	modalContainer.setVisible(false);
+    	modalContainer.setOpacity(0);
     }
     
     @FXML
-    void submit(ActionEvent event) {
-    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty())
-    	{
-    		Alert alert = new Alert(AlertType.INFORMATION);
-    		alert.setTitle("ERROR!");
-    		alert.setHeaderText("Missing Title/Artist");
-    		alert.setContentText("To add a song, please input the required fields.");
-    		alert.showAndWait();
-    	}
-    	else {    	
-    	Song test = new Song(titleText.getText(), artistText.getText(), albumText.getText(), Integer.parseInt(yearText.getText()));
-    	
+    void showModalView() {
+    	modalContainer.setVisible(true);
+    	modalContainer.setOpacity(1);
+    }
 
-    	
+	private void select(Stage mainStage) {		//reminder, there might be a bug here             
+		String song = songsList.getSelectionModel().getSelectedItem();
+		if(song != null) {
+			
+			String info[] = song.split(" ");
+	    	titleLabel.setText(info[0]);
+	    	artistLabel.setText(info[1]);
+	        albumLabel.setText(info[2]);
+	        releasedateLabel.setText(info[3]);
+		}
+
+
+	}
+    
+    private void formCleanUp() {
+        titleText.clear();
+        artistText.clear();
+        albumText.clear();
+        yearText.clear();
+    }
+    
+    private void debugAdd(Song test) {
     	System.out.println(test.getTitle());
     	System.out.println(test.getArtist());
     	System.out.println(test.getAlbum());
     	System.out.println(test.getYear());
-    	
-    	obsList.add(test.getTitle()+"\t"+test.getArtist()+"\t"+test.getAlbum()+"\t"+test.getYear());
-    	songsList.setItems(obsList);
-    	modalContainer.setVisible(false);
-    	modalContainer.setOpacity(0);
-    	}
     }
-    
-    @FXML
-    void exitModalView(ActionEvent event) {
-  
-    	modalContainer.setVisible(false);
-    	modalContainer.setOpacity(0);
-    }
-    
-    @FXML
-    void showModalView(ActionEvent event) {
-    	modalContainer.setVisible(true);
-    	modalContainer.setOpacity(1);
-    }
-    
 
 
 }
