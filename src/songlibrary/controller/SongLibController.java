@@ -51,11 +51,12 @@ public class SongLibController {
     
     @FXML private ListView<String> songsList;
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
-    private JSONArray data;
+    private JSONArray data; // might not be a JSONArray, might need something else
    
     
     public void start(Stage mainStage) {
-    	
+    	// will do some basic set up before the program starts
+        // use org.json to parse json
     	
 		try {
 			String location = "src/songlibrary/controller/listData.json";
@@ -63,7 +64,7 @@ public class SongLibController {
 			JSONObject parser = new JSONObject(jsonString);
 			data = parser.getJSONArray("songs");
 	    	
-	    	System.out.println(data.toString());
+	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
 	    	
 	    	songsList		
 	    	.getSelectionModel()
@@ -79,7 +80,7 @@ public class SongLibController {
     }
     
     private void addSong(Optional<String[]> songInfo) {
-
+        // This function no longer an event listenter. it gets called from submit
     	if(songInfo.isPresent()) {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {
@@ -121,7 +122,7 @@ public class SongLibController {
     }
     
     @FXML void submit(ActionEvent event) {
-    	
+    	// event listener on submit button. 
     	Optional<String[]> songInformation = Optional.empty();
     	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty()){
     		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
@@ -137,10 +138,9 @@ public class SongLibController {
     
     
   //Helper Functions:
-
-
     
     private void showAlert(String title, String header, String content) {
+        // just a function to use if we need to show alerts
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -157,12 +157,14 @@ public class SongLibController {
     
     @FXML
     void showModalView() {
+        // set this as an event listener for add button
     	modalContainer.setVisible(true);
     	modalContainer.setOpacity(1);
     }
 
 	private void select(Stage mainStage) {		//reminder, there might be a bug here             
-		String song = songsList.getSelectionModel().getSelectedItem();
+		// this function technically works but if you make some debugging statements, it looks like it doesn't
+        String song = songsList.getSelectionModel().getSelectedItem();
 		if(song != null) {
 			
 			String info[] = song.split(" ");
@@ -176,6 +178,7 @@ public class SongLibController {
 	}
     
     private void formCleanUp() {
+        // removes text from the form fields after submitting
         titleText.clear();
         artistText.clear();
         albumText.clear();
@@ -183,6 +186,7 @@ public class SongLibController {
     }
     
     private void debugAdd(Song test) {
+        // just print statements. not important. delete if you'd like
     	System.out.println(test.getTitle());
     	System.out.println(test.getArtist());
     	System.out.println(test.getAlbum());
