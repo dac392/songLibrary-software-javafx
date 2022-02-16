@@ -1,21 +1,18 @@
 package songlibrary.controller;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
+
 
 public class Song {
 	
 	private String title;
 	private String artist;
-	private String album = "unknown";
-	private String date = "unknown";
+	private String album;
+	private String year;
 	private int listIndex;
 	
 	
-	public Song(String title, String artist, String album, String date, int listIndex) {
+	public Song(String title, String artist, String album, String year, int listIndex) {
 		
 		this.title = title;
 		this.artist = artist;
@@ -23,27 +20,26 @@ public class Song {
 		if(!album.equals("")) {
 			this.album = album;
 		}
+		int y = Integer.parseInt(year);
 		
-		if(dateValidation(date)) {
-			this.date = date;
-		}
+		this.year = (y > 0)? year : "unknown";
+		
 		this.setListIndex(listIndex);
 		
 	}
 	
+
 	public Song(String[] info, int index) {
+		int d = -1;
+		if(intChecker(info[3]) == 0) {
+			d = Integer.parseInt(info[3]);
+		}
+		
 		this.listIndex = index;
 		this.title = info[0];
 		this.artist = info[1];
 		this.album = (!info[2].equals(""))? info[2]:"unknown";
-		this.date = (!info[3].equals(""))? info[3]:"unknown";
-	}
-
-	private boolean dateValidation(String date) {
-		String regex = "^(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])/[0-9]{4}$";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(date);
-		return matcher.matches();
+		this.year = (d > 0)? info[3] : "unknown";
 	}
 	
 	public String getTitle() {
@@ -59,7 +55,7 @@ public class Song {
 	}	
 	
 	public String getYear() {
-		return date;
+		return year;
 	}
 	
 	public void setTitle(String a) {
@@ -78,10 +74,9 @@ public class Song {
 	}	
 	
 	public void setYear(String a) {
-		if(dateValidation(a)) {
-			date = a;
+		if(Integer.parseInt(a)>0) {
+			year = a;
 		}
-		
 		
 	}
 	public String toString() {
@@ -111,7 +106,18 @@ public class Song {
 			}
 		}
 
-		
 		return true;
+	}
+	
+	private int intChecker(String potentialNum) {
+		int d = 0;
+		for(int i = 0; i < potentialNum.length(); i++) {
+			if(potentialNum.charAt(i)<'0'| potentialNum.charAt(i)>'9') {
+				d = -1;
+				break;
+			}
+		}
+		return d;
+		
 	}
 }
