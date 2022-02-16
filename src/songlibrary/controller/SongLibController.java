@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import org.json.JSONObject;
 
 import javafx.collections.FXCollections;
@@ -73,6 +74,7 @@ public class SongLibController {
 			}
 			obsList.sort(null);
 			songsList.setItems(obsList);
+
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
 	    	
 	    	songsList		
@@ -88,6 +90,7 @@ public class SongLibController {
 		catch(JSONException e) {
 			e.printStackTrace();
 		}
+
 
     }
     
@@ -129,6 +132,7 @@ public class SongLibController {
         			e.printStackTrace();
         		}
         		 
+
 //        		data.put(song);
 //        		System.out.println(data.toString());
         		
@@ -167,6 +171,10 @@ public class SongLibController {
     	
     	addSong(songInformation);
     	
+
+    	
+    	addSong(songInformation);
+    	
     }
     
     
@@ -185,6 +193,7 @@ public class SongLibController {
     
 	@FXML
     void exitModalView() {
+
 
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
