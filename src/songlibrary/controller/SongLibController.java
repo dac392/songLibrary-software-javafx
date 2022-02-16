@@ -14,12 +14,15 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
 import javafx.collections.ObservableList;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+
 import org.json.JSONObject;
 
 import javafx.collections.FXCollections;
@@ -64,6 +67,14 @@ public class SongLibController {
 			JSONObject parser = new JSONObject(jsonString);
 			data = parser.getJSONArray("songs");
 	    	
+			for(int i = 0; i < data.length(); i++) {
+				JSONObject b = data.getJSONObject(i);
+				Song a = new Song(b.optString("title"),b.optString("artist"),b.optString("album"),b.optString("year"), 0);
+				obsList.add(a.toString());
+			}
+			obsList.sort(null);
+			songsList.setItems(obsList);
+
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
 	    	
 	    	songsList		
@@ -76,6 +87,10 @@ public class SongLibController {
 			e.printStackTrace();
 			
 		}
+		catch(JSONException e) {
+			e.printStackTrace();
+		}
+
 
     }
     
@@ -95,6 +110,29 @@ public class SongLibController {
         		songsList.getSelectionModel().select(newIndex);
         		
         		//wrong
+        		try {
+        			JSONObject input = new JSONObject();
+            		input.put("title", song.getTitle());
+            		input.put("artist", song.getArtist());
+            		input.put("album", song.getAlbum());
+            		input.put("year", song.getYear());
+            		
+            		data.put(input);
+            	
+            		
+            		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+            		file.write("{songs: "+data+"}");
+            		file.flush();
+            		file.close();
+
+        		}catch(JSONException e) {
+        			e.printStackTrace();
+        		}
+        		catch(IOException e) {
+        			e.printStackTrace();
+        		}
+        		 
+
 //        		data.put(song);
 //        		System.out.println(data.toString());
         		
@@ -133,6 +171,10 @@ public class SongLibController {
     	
     	addSong(songInformation);
     	
+
+    	
+    	addSong(songInformation);
+    	
     }
     
     
@@ -151,8 +193,11 @@ public class SongLibController {
     
 	@FXML
     void exitModalView() {
+
+
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
+    	
     }
     
     @FXML

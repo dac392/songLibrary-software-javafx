@@ -17,6 +17,7 @@ public class Song {
 		this.title = title;
 		this.artist = artist;
 		
+		this.album = "Unknown";
 		if(!album.equals("")) {
 			this.album = album;
 		}
@@ -24,6 +25,16 @@ public class Song {
 		
 		this.year = (y > 0)? year : "unknown";
 		
+		this.year = "Unknown";
+		if(!year.equals("")&&!year.toLowerCase().equals("unknown") )
+		{
+			int y = Integer.parseInt(year);
+		
+			this.year = (y > 0)? year : "unknown";
+		
+			this.setListIndex(listIndex);
+		}
+
 		this.setListIndex(listIndex);
 		
 	}
@@ -31,6 +42,8 @@ public class Song {
 
 	public Song(String[] info, int index) {
 		int d = -1;
+		if(!info[3].equals("") && intChecker(info[3]) == 0) {
+
 		if(intChecker(info[3]) == 0) {
 			d = Integer.parseInt(info[3]);
 		}
