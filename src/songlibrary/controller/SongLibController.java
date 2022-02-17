@@ -3,6 +3,7 @@ package songlibrary.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
@@ -22,7 +23,6 @@ import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import org.json.JSONObject;
 
 import javafx.collections.FXCollections;
@@ -74,7 +74,6 @@ public class SongLibController {
 			}
 			obsList.sort(null);
 			songsList.setItems(obsList);
-
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
 	    	
 	    	songsList		
@@ -90,7 +89,6 @@ public class SongLibController {
 		catch(JSONException e) {
 			e.printStackTrace();
 		}
-
 
     }
     
@@ -132,7 +130,6 @@ public class SongLibController {
         			e.printStackTrace();
         		}
         		 
-
 //        		data.put(song);
 //        		System.out.println(data.toString());
         		
@@ -151,6 +148,32 @@ public class SongLibController {
 
 	@FXML void deleteSong(ActionEvent event) {
     	System.out.println("deleted a song");
+    	//Assuming select works fine.
+    	
+    	int a = songsList.getSelectionModel().getSelectedIndex();
+    	if(a > -1 && songsList.getItems().size() > 1)
+    	{
+    	Alert warning = new Alert(AlertType.WARNING, "Are you sure?", ButtonType.OK, ButtonType.CANCEL);
+    	warning.setTitle("WARNING");
+    	Optional<ButtonType> answer = warning.showAndWait();
+    	if(answer.get() == ButtonType.OK)
+    	{
+    	try {
+    	data.remove(a);
+    	FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+		file.write("{songs: "+data+"}");
+		file.flush();
+		file.close();
+    	}catch(IOException e) {
+    		e.printStackTrace();
+    	}
+    	songsList.getItems().remove(a);
+    	
+    	}
+    	}
+    	else {
+    		System.out.println("JK");
+    	}
     }
 
     @FXML
@@ -168,10 +191,6 @@ public class SongLibController {
     		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
     		songInformation = Optional.of(newSongInfo);
     	}
-    	
-    	addSong(songInformation);
-    	
-
     	
     	addSong(songInformation);
     	
@@ -194,7 +213,6 @@ public class SongLibController {
 	@FXML
     void exitModalView() {
 
-
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
     	
@@ -210,14 +228,22 @@ public class SongLibController {
 	private void select(Stage mainStage) {		//reminder, there might be a bug here             
 		// this function technically works but if you make some debugging statements, it looks like it doesn't
         String song = songsList.getSelectionModel().getSelectedItem();
+        
+        int a = songsList.getSelectionModel().getSelectedIndex();
+        
 		if(song != null) {
-			
+			try {
 			String info[] = song.split(" ");
-	    	titleLabel.setText(info[0]);
-	    	artistLabel.setText(info[1]);
-	        albumLabel.setText(info[2]);
-	        releasedateLabel.setText(info[3]);
+	    	titleLabel.setText(data.getJSONObject(a).getString("title"));
+	    	artistLabel.setText(data.getJSONObject(a).getString("artist"));
+	        albumLabel.setText(data.getJSONObject(a).getString("album"));
+	        releasedateLabel.setText(data.getJSONObject(a).getString("year"));
+			}catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
+		
+	
 
 
 	}
