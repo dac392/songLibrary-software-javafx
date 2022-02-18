@@ -75,12 +75,14 @@ public class SongLibController {
 			}
 			obsList.sort(null);
 			songsList.setItems(obsList);
+			
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
 	    	
 	    	songsList		
 	    	.getSelectionModel()
 			.selectedIndexProperty()
 			.addListener( (obs, oldVal, newVal) -> select(mainStage));
+	    	songsList.getSelectionModel().select(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Sorry, this is not a valid location");
@@ -99,7 +101,7 @@ public class SongLibController {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {
     			obsList.add(song.toString());
-    		//	obsList.sort(null);
+    			obsList.sort(null);
     			songsList.setItems(obsList);
         		exitModalView();
             	formCleanUp();
@@ -117,7 +119,8 @@ public class SongLibController {
             		input.put("year", song.getYear());
             		
             		data.put(input);
-
+            		
+            		sortData();
             		
             		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
             		file.write("{songs: "+data+"}");
@@ -155,8 +158,9 @@ public class SongLibController {
             		file.write("{songs: "+data+"}");
             		file.flush();
             		file.close();
+            		sortData();
             		obsList.set(a, song.toString());
-            		//	obsList.sort(null);
+            		obsList.sort(null);
             		songsList.setItems(obsList);
             		titleLabel.setText(data.getJSONObject(a).getString("title"));
             		artistLabel.setText(data.getJSONObject(a).getString("artist"));
@@ -211,6 +215,7 @@ public class SongLibController {
     	}
     	else {
     		System.out.println("JK");
+    		showAlert("Error!", "Cannot Delete!", "The list of songs needs at least one song!");
     	}
     }
 
@@ -318,6 +323,26 @@ public class SongLibController {
     	System.out.println(test.getAlbum());
     	System.out.println(test.getYear());
     }
-
+    
+    private void sortData() {
+    	for(int i = 0; i < data.length(); i++)
+    	{
+    		for(int j = i+1; j < data.length(); j++)
+    		{
+    			try {
+    			if(data.getJSONObject(j).optString("title").compareTo(data.getJSONObject(i).optString("title"))<0)
+    				{
+    					JSONObject temp = new JSONObject();
+    					temp = data.getJSONObject(i);
+    					data.put(i, data.get(j));
+    					data.put(j, temp);
+    				
+    				}
+    			}catch(JSONException e) {
+    				e.printStackTrace();
+    			}
+    		}
+    	}
+    }
 
 }

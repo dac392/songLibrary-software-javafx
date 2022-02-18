@@ -88,23 +88,23 @@ public class Song {
 		
 		String a = this.getTitle();
 		
-		if(a.length() > 15)
-			a = a.substring(0,12) + "...";
+		//if(a.length() > 15)
+		//	a = a.substring(0,12) + "...";
 		
 		String b = this.getArtist();
-		if(b.length() > 15)
-			b = b.substring(0,12) + "...";
+		//if(b.length() > 15)
+			//b = b.substring(0,12) + "...";
 		
 		String c = this.getAlbum();
-		if(c.length() > 15)
-			c = c.substring(0,12) + "...";
+		//if(c.length() > 15)
+			//c = c.substring(0,12) + "...";
 		
 		String d = this.getYear();
-		if(d.length() > 15)
-			d = d.substring(0,12) + "...";
+		//if(d.length() > 15)
+			//d = d.substring(0,12) + "...";
 		
 		
-		return String.format("%-20s\t\t\t %-20s\t\t\t %-20s\t\t\t %-20s", a,b,c,d);
+		return ("Song: "+a+"\nArtist: "+b+"\nAlbum: "+c+"\nYear: "+d+"\n");
 	}
 
 	public int getListIndex() {
