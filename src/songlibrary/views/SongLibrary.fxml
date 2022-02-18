@@ -101,7 +101,7 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Button id="edit-button" fx:id="editButton" alignment="CENTER" mnemonicParsing="false" onAction="#showModalView" prefHeight="57.0" prefWidth="157.0" stylesheets="@../main/styles.css" text="Edit">
+                        <Button id="edit-button" fx:id="editButton" alignment="CENTER" mnemonicParsing="false" onAction="#editSong" prefHeight="57.0" prefWidth="157.0" stylesheets="@../main/styles.css" text="Edit">
                            <font>
                               <Font name="Courier New" size="30.0" />
                            </font>

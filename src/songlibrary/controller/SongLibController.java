@@ -55,6 +55,7 @@ public class SongLibController {
     @FXML private ListView<String> songsList;
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
     private JSONArray data; // might not be a JSONArray, might need something else
+    private boolean editing = false;
    
     
     public void start(Stage mainStage) {
@@ -94,18 +95,18 @@ public class SongLibController {
     
     private void addSong(Optional<String[]> songInfo) {
         // This function no longer an event listenter. it gets called from submit
-    	if(songInfo.isPresent()) {
+    	if(songInfo.isPresent() && !editing) {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {
     			obsList.add(song.toString());
-    			obsList.sort(null);
+    		//	obsList.sort(null);
     			songsList.setItems(obsList);
         		exitModalView();
             	formCleanUp();
             	
         		int newIndex = obsList.indexOf(song.toString());
         		song.setListIndex(newIndex);
-        		songsList.getSelectionModel().select(newIndex);
+        		
         		
         		//wrong
         		try {
@@ -116,7 +117,7 @@ public class SongLibController {
             		input.put("year", song.getYear());
             		
             		data.put(input);
-            	
+
             		
             		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
             		file.write("{songs: "+data+"}");
@@ -129,13 +130,50 @@ public class SongLibController {
         		catch(IOException e) {
         			e.printStackTrace();
         		}
+        		songsList.getSelectionModel().select(newIndex);
         		 
 //        		data.put(song);
 //        		System.out.println(data.toString());
         		
         		
 
+    		}
+    	}
+    		else if(editing){
+        		Song song = new Song(songInfo.get(), obsList.size());
+
+    			try {
+    		        int a = songsList.getSelectionModel().getSelectedIndex();
+
+    				data.getJSONObject(a).put("title", song.getTitle());
+    				data.getJSONObject(a).put("artist", song.getArtist());
+    				data.getJSONObject(a).put("album", song.getAlbum());
+    				data.getJSONObject(a).put("year", song.getYear());
+    				
+    				editing = false;
+    				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+            		file.write("{songs: "+data+"}");
+            		file.flush();
+            		file.close();
+            		obsList.set(a, song.toString());
+            		//	obsList.sort(null);
+            		songsList.setItems(obsList);
+            		titleLabel.setText(data.getJSONObject(a).getString("title"));
+            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
+            	    albumLabel.setText(data.getJSONObject(a).getString("album"));
+            	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
+            		exitModalView();
+            		formCleanUp();
+    			}catch(JSONException e) {
+    				e.printStackTrace();
+    				
+    			}catch(IOException e) {
+    				e.printStackTrace();
+    			}
+    			
     		}else {
+    		
+    		
     			showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
         	}
     		
@@ -143,7 +181,7 @@ public class SongLibController {
     	}
     	
     	
-    }
+    
 
 
 	@FXML void deleteSong(ActionEvent event) {
@@ -176,10 +214,24 @@ public class SongLibController {
     	}
     }
 
-    @FXML
-    void editSong(ActionEvent event) {
-    	System.out.println("edited a song");
-    	showModalView();
+    @FXML void editSong(ActionEvent event) {
+    	int a = songsList.getSelectionModel().getSelectedIndex();
+    	if(a > -1)
+    	{
+    		try {
+    		titleText.setText(data.getJSONObject(a).getString("title"));
+    		artistText.setText(data.getJSONObject(a).getString("artist"));
+    		albumText.setText(data.getJSONObject(a).getString("album"));
+    		yearText.setText(data.getJSONObject(a).getString("year"));
+    		System.out.println("edited a song");
+    		modalContainer.setVisible(true);
+    		modalContainer.setOpacity(1);
+    		editing = true;
+    		}catch(JSONException e) {
+    			e.printStackTrace();
+    		}
+    	}
+ 
     }
     
     @FXML void submit(ActionEvent event) {
@@ -215,9 +267,11 @@ public class SongLibController {
 
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
+    	formCleanUp();
+    	editing = false;
     	
     }
-    
+     
     @FXML
     void showModalView() {
         // set this as an event listener for add button
@@ -254,6 +308,7 @@ public class SongLibController {
         artistText.clear();
         albumText.clear();
         yearText.clear();
+        System.out.println("This went throught");
     }
     
     private void debugAdd(Song test) {
