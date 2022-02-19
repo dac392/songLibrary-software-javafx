@@ -85,7 +85,26 @@ public class Song {
 		
 	}
 	public String toString() {
-		return this.getTitle()+" "+this.getArtist()+" "+this.getAlbum()+" "+this.getYear()+" "+this.getListIndex();
+		
+		String a = this.getTitle();
+		
+		//if(a.length() > 15)
+		//	a = a.substring(0,12) + "...";
+		
+		String b = this.getArtist();
+		//if(b.length() > 15)
+			//b = b.substring(0,12) + "...";
+		
+		String c = this.getAlbum();
+		//if(c.length() > 15)
+			//c = c.substring(0,12) + "...";
+		
+		String d = this.getYear();
+		//if(d.length() > 15)
+			//d = d.substring(0,12) + "...";
+		
+		
+		return ("Song: "+a+"\nArtist: "+b+"\nAlbum: "+c+"\nYear: "+d+"\n");
 	}
 
 	public int getListIndex() {
