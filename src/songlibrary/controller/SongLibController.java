@@ -47,6 +47,7 @@ public class SongLibController {
     @FXML private Label artistLabel;		// required
     @FXML private Label releasedateLabel;	// "unknown" if not set
     @FXML private Label titleLabel;			// "unknown" if not set
+    @FXML private Label mode;
     
     // elements
     @FXML private VBox list;
@@ -154,6 +155,7 @@ public class SongLibController {
     				data.getJSONObject(a).put("year", song.getYear());
     				
     				editing = false;
+    				mode.setText("Editing a Song");
     				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
             		file.write("{songs: "+data+"}");
             		file.flush();
@@ -189,32 +191,36 @@ public class SongLibController {
 
 
 	@FXML void deleteSong(ActionEvent event) {
-    	System.out.println("deleted a song");
-    	//Assuming select works fine.
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
+    	
     	if(a > -1 && songsList.getItems().size() > 1)
     	{
-    	Alert warning = new Alert(AlertType.WARNING, "Are you sure?", ButtonType.OK, ButtonType.CANCEL);
-    	warning.setTitle("WARNING");
-    	Optional<ButtonType> answer = warning.showAndWait();
-    	if(answer.get() == ButtonType.OK)
-    	{
+    	
     	try {
-    	data.remove(a);
-    	FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-		file.write("{songs: "+data+"}");
-		file.flush();
-		file.close();
+    		Alert warning = new Alert(AlertType.WARNING, "Deleting "+data.getJSONObject(a).getString("title")+" by "+data.getJSONObject(a).getString("artist")+ ". Are you sure?", ButtonType.OK, ButtonType.CANCEL);
+    		warning.setTitle("WARNING");
+    		Optional<ButtonType> answer = warning.showAndWait();
+    		if(answer.get() == ButtonType.OK)
+    		{
+    			data.remove(a);
+    			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+    			file.write("{songs: "+data+"}");
+    			file.flush();
+    			file.close();
+    			songsList.getItems().remove(a);
+    		}
+    	
+    	}catch(JSONException e) {
+    		e.printStackTrace();
     	}catch(IOException e) {
     		e.printStackTrace();
-    	}
-    	songsList.getItems().remove(a);
     	
     	}
+    	
     	}
-    	else {
-    		System.out.println("JK");
+    	
+    	else {	
     		showAlert("Error!", "Cannot Delete!", "The list of songs needs at least one song!");
     	}
     }
@@ -228,10 +234,10 @@ public class SongLibController {
     		artistText.setText(data.getJSONObject(a).getString("artist"));
     		albumText.setText(data.getJSONObject(a).getString("album"));
     		yearText.setText(data.getJSONObject(a).getString("year"));
-    		System.out.println("edited a song");
     		modalContainer.setVisible(true);
     		modalContainer.setOpacity(1);
     		editing = true;
+    		mode.setText("Editing a Song");
     		}catch(JSONException e) {
     			e.printStackTrace();
     		}
@@ -244,12 +250,18 @@ public class SongLibController {
     	Optional<String[]> songInformation = Optional.empty();
     	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty()){
     		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
-    	}else {
-    		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
-    		songInformation = Optional.of(newSongInfo);
     	}
     	
-    	addSong(songInformation);
+    	else if(!yearText.getText().isEmpty() && !yearText.getText().matches("[0-9]+")) {
+    		showAlert("Error!", "Invalid Year!", "Please enter a valid year.");
+    	}
+    	else {
+    		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
+    		songInformation = Optional.of(newSongInfo);
+    		addSong(songInformation);
+    	}
+    	
+    	
     	
     }
     
@@ -274,6 +286,7 @@ public class SongLibController {
     	modalContainer.setOpacity(0);
     	formCleanUp();
     	editing = false;
+    	mode.setText("Adding a Song");
     	
     }
      
@@ -313,7 +326,7 @@ public class SongLibController {
         artistText.clear();
         albumText.clear();
         yearText.clear();
-        System.out.println("This went throught");
+       
     }
     
     private void debugAdd(Song test) {
