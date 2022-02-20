@@ -83,7 +83,8 @@ public class SongLibController {
 	    	.getSelectionModel()
 			.selectedIndexProperty()
 			.addListener( (obs, oldVal, newVal) -> select(mainStage));
-	    	songsList.getSelectionModel().select(0);
+	    	if(data.length() > 0)
+	    		songsList.getSelectionModel().select(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Sorry, this is not a valid location");
@@ -102,7 +103,6 @@ public class SongLibController {
     	
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(!editing && song.canBeAdded(obsList)) {  			    			
-    				System.out.println(song.canBeAdded(obsList));
     				obsList.add(song.toString());
     				obsList.sort(null);
     				songsList.setItems(obsList);
@@ -192,7 +192,7 @@ public class SongLibController {
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
     	
-    	if(a > -1 && songsList.getItems().size() > 1)
+    	if(a > -1)
     	{
     	
     	try {
@@ -218,9 +218,7 @@ public class SongLibController {
     	
     	}
     	
-    	else {	
-    		showAlert("Error!", "Cannot Delete!", "The list of songs needs at least one song!");
-    	}
+
     }
 
     @FXML void editSong(ActionEvent event) {

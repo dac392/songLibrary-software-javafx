@@ -126,9 +126,7 @@ public class Song {
 			for(int i = 0; i < obslist.size(); i++) {
 				String element = obslist.get(i);
 				String songInList[] = element.toLowerCase().split("\n");
-				
-				System.out.println(songInList[0] +" = "+songTitle);
-				System.out.println(songInList[1] +" = "+songArtist);
+			
 				
 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
 					return false;
