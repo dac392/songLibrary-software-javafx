@@ -15,10 +15,8 @@ import javafx.scene.control.ListView;
 import javafx.collections.ObservableList;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.Optional;
 
 import org.json.JSONArray;
@@ -43,10 +41,10 @@ public class SongLibController {
     @FXML private TextField yearText;
     
     // labels
-    @FXML private Label albumLabel;			// required
-    @FXML private Label artistLabel;		// required
-    @FXML private Label releasedateLabel;	// "unknown" if not set
-    @FXML private Label titleLabel;			// "unknown" if not set
+    @FXML private Label albumLabel;
+    @FXML private Label artistLabel;
+    @FXML private Label releasedateLabel;
+    @FXML private Label titleLabel;
     @FXML private Label mode;
     
     // elements
@@ -55,7 +53,7 @@ public class SongLibController {
     
     @FXML private ListView<String> songsList;
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
-    private JSONArray data; // might not be a JSONArray, might need something else
+    private JSONArray data;
     private int instruction = -1;
     private final int ADD = 0;
     private final int EDIT = 1;
@@ -66,7 +64,6 @@ public class SongLibController {
     
     public void start(Stage mainStage) {
     	// will do some basic set up before the program starts
-        // use org.json to parse json
     	
 		try {
 			String location = "src/songlibrary/controller/listData.json";
@@ -81,38 +78,75 @@ public class SongLibController {
 			}
 
 			obsList.sort(String.CASE_INSENSITIVE_ORDER);
-			//obsList.sort(null);
 			songsList.setItems(obsList);
-			
-	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
-	    	
+
 	    	songsList		
 	    	.getSelectionModel()
 			.selectedIndexProperty()
 			.addListener( (obs, oldVal, newVal) -> select(mainStage));
 	    	if(data.length() > 0)
 	    		songsList.getSelectionModel().select(0);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			System.out.println("Sorry, this is not a valid location");
-			e.printStackTrace();
-			
-		}
-		catch(JSONException e) {
-			e.printStackTrace();
 		}
 
     }
     
+	@FXML void exitModalView() {
+
+    	modalContainer.setVisible(false);
+    	modalContainer.setOpacity(0);
+    	instruction = -1;
+    	formCleanUp();
+    	
+    }
+     
+    @FXML void showModalView(ActionEvent event) {
+    	boolean edit = event.getTarget().toString().contains("Edit");
+    	instruction = (edit)? EDIT : ADD;
+    	if(edit && fetchEditInfo()) {
+    		instruction = EDIT;
+    		mode.setText("Editing a Song");
+    		modalContainer.setVisible(true);
+        	modalContainer.setOpacity(1);
+    		
+    	}else if(!edit){
+    		instruction = ADD;
+    		mode.setText("Adding a Song");
+    		modalContainer.setVisible(true);
+        	modalContainer.setOpacity(1);
+    	}
+    	
+    }
+    
+    @FXML void submit(ActionEvent event) {
+    	// event listener on submit button. 
+    	Optional<String[]> songInformation = Optional.empty();
+    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty() || titleText.getText().trim().length() == 0 || artistText.getText().trim().length()==0){
+    		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
+    	}else if( (!yearText.getText().isEmpty() && !yearText.getText().equals("unknown")) && !yearText.getText().matches("[0-9]+")) {
+    		showAlert("Error!", "Invalid Year!", "Please enter a valid year.");
+    	}else {
+    		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
+    		songInformation = Optional.of(newSongInfo);
+    		if(instruction == ADD) {
+    			addSong(songInformation);
+    		}else if(instruction == EDIT) {
+    			editSong(songInformation);
+    		}else {
+    			System.err.println("Warning: Instruction was not set");
+    		}
+    		
+    	}
+    }
+    
     private void addSong(Optional<String[]> songInfo) {
-        // This function no longer an event listenter. it gets called from submit
     	if(songInfo.isPresent()) { 
     	
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
     				obsList.sort(String.CASE_INSENSITIVE_ORDER);
-    				//obsList.sort( Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
     				songsList.setItems(obsList);
     				addToJson(song, null);
     				
@@ -125,41 +159,13 @@ public class SongLibController {
     	}
 
     }
-    private void addToJson(Song song, JSONObject input) {
-		try {
-			if(input == null) {
-				input = new JSONObject();
-			}
-			input.put("title", song.getTitle());
-			input.put("artist", song.getArtist());
-			input.put("album", song.getAlbum());
-			input.put("year", song.getYear());
-			
-			if(instruction == ADD) {
-				data.put(input);
-				sortData();
-						// i feel like this should go outside
-			}
-			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-			file.write("{\"songs\": "+data+"}");
-			file.flush();
-			file.close();
-		
-		}catch(JSONException e) {
-			e.printStackTrace();
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-			
-    }
+    
     private void editSong(Optional<String[]> songInfo) {
     	if(songInfo.isPresent()) {
         	
 
 	    	Song song = new Song(songInfo.get(), obsList.size());
 	    	if(song.canBeAdded(obsList, oldTitle, oldArtist)){
-	    		// what if you don't change the title/album what so ever?
 	    		try {
 	    		int a = songsList.getSelectionModel().getSelectedIndex();
 	    		addToJson(song, data.getJSONObject(a));
@@ -167,7 +173,6 @@ public class SongLibController {
         		
         		obsList.set(a, song.toString());
         		obsList.sort(String.CASE_INSENSITIVE_ORDER);
-        		//obsList.sort(Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
         		songsList.setItems(obsList);
         		a = obsList.indexOf(song.toString());
         		titleLabel.setText(data.getJSONObject(a).getString("title"));
@@ -186,32 +191,6 @@ public class SongLibController {
     	}
     }
     
-    private boolean fetchEditInfo() {
-    	int a = songsList.getSelectionModel().getSelectedIndex();
-    	if(a > -1) {
-    		try {
-	    		titleText.setText(data.getJSONObject(a).getString("title"));
-	    		artistText.setText(data.getJSONObject(a).getString("artist"));
-	    		albumText.setText(data.getJSONObject(a).getString("album"));
-	    		yearText.setText(data.getJSONObject(a).getString("year"));
-	    		oldTitle = data.getJSONObject(a).getString("title");
-	    		oldArtist = data.getJSONObject(a).getString("artist");
-	    		return true;
-    		}catch(JSONException e) {
-    			e.printStackTrace();
-    			return false;
-    		}
-    	}else {
-    		showAlert("Error","Empty list", "Cannot edit an empty list, please add a song first.");
-    	}
-    	// SHOULD PROBABLY SHOW A MESSAGE SAYING THAT YOU CAN'T EDIT IF YOU DON'T HAVE ANY SONGS
-    	return false;
-    }
-    	
-    	
-    
-
-
 	@FXML void deleteSong(ActionEvent event) {
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
@@ -251,92 +230,63 @@ public class SongLibController {
     			songsList.setItems(obsList);
     		}
     	
-    	}catch(JSONException e) {
+    	}catch(Exception e) {
     		e.printStackTrace();
-    	}catch(IOException e) {
-    		e.printStackTrace();
-    	
     	}
     	
     	}
     	
 
     }
-
-    
-    @FXML void submit(ActionEvent event) {
-    	// event listener on submit button. 
-    	Optional<String[]> songInformation = Optional.empty();
-    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty() || titleText.getText().trim().length() == 0 || artistText.getText().trim().length()==0){
-    		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
-    	}
-    	
-    	else if( (!yearText.getText().isEmpty() && !yearText.getText().equals("unknown")) && !yearText.getText().matches("[0-9]+")) {
-    		showAlert("Error!", "Invalid Year!", "Please enter a valid year.");
-    	}
-    	else {
-    		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
-    		songInformation = Optional.of(newSongInfo);
-    		if(instruction == ADD) {
-    			addSong(songInformation);
-    		}else if(instruction == EDIT) {
-    			editSong(songInformation);
-    		}else {
-    			System.err.println("Warning: Instruction was not set");
-    		}
-    		
-    	}
-    	
-    	
-    	
-    }
-    
-    
-    
-  //Helper Functions:
-    
-    private void showAlert(String title, String header, String content) {
-        // just a function to use if we need to show alerts
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		alert.setContentText(content);
-		alert.showAndWait();
+    private void addToJson(Song song, JSONObject input) {
+		try {
+			if(input == null) {
+				input = new JSONObject();
+			}
+			input.put("title", song.getTitle());
+			input.put("artist", song.getArtist());
+			input.put("album", song.getAlbum());
+			input.put("year", song.getYear());
+			
+			if(instruction == ADD) {
+				data.put(input);
+				sortData();
+			}
+			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+			file.write("{\"songs\": "+data+"}");
+			file.flush();
+			file.close();
 		
-	}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+			
+    }
     
-	@FXML
-    void exitModalView() {
-
-    	modalContainer.setVisible(false);
-    	modalContainer.setOpacity(0);
-    	instruction = -1;
-    	formCleanUp();
-    	
-    }
-     
-    @FXML
-    void showModalView(ActionEvent event) {
-        // set this as an event listener for add button
-    	boolean edit = event.getTarget().toString().contains("Edit");
-    	instruction = (edit)? EDIT : ADD;
-    	if(edit && fetchEditInfo()) {
-    		instruction = EDIT;
-    		mode.setText("Editing a Song");
-    		modalContainer.setVisible(true);
-        	modalContainer.setOpacity(1);
-    		
-    	}else if(!edit){
-    		instruction = ADD;
-    		mode.setText("Adding a Song");
-    		modalContainer.setVisible(true);
-        	modalContainer.setOpacity(1);
+    private boolean fetchEditInfo() {
+    	int a = songsList.getSelectionModel().getSelectedIndex();
+    	if(a > -1) {
+    		try {
+	    		titleText.setText(data.getJSONObject(a).getString("title"));
+	    		artistText.setText(data.getJSONObject(a).getString("artist"));
+	    		albumText.setText(data.getJSONObject(a).getString("album"));
+	    		yearText.setText(data.getJSONObject(a).getString("year"));
+	    		oldTitle = data.getJSONObject(a).getString("title");
+	    		oldArtist = data.getJSONObject(a).getString("artist");
+	    		return true;
+    		}catch(JSONException e) {
+    			e.printStackTrace();
+    			return false;
+    		}
+    	}else {
+    		showAlert("Error","Empty list", "Cannot edit an empty list, please add a song first.");
     	}
-    	
+    	return false;
     }
 
-	private void select(Stage mainStage) {		//reminder, there might be a bug here             
-		// this function technically works but if you make some debugging statements, it looks like it doesn't
+
+
+	private void select(Stage mainStage) {
         String song = songsList.getSelectionModel().getSelectedItem();
         
         int a = songsList.getSelectionModel().getSelectedIndex();
@@ -354,9 +304,17 @@ public class SongLibController {
 
 
 	}
+	
+    private void showAlert(String title, String header, String content) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+		
+	}
     
     private void formCleanUp() {
-        // removes text from the form fields after submitting
         titleText.clear();
         artistText.clear();
         albumText.clear();
