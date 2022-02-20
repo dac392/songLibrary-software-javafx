@@ -1,0 +1,39 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+/*
+ * 	#dcd0e8 -> purple
+ * 	#f6d7e8
+ *  #f2bfd7 -> pink
+ *  #f6c3b2 -> ?
+ * #f0e1e3
+ * #f6edee
+ */
+.description-container{
+	-fx-background-color: #bfd1df;
+}
+.description-card{
+	-fx-background-color: #35455d;
+	-fx-background-radius: 30.0px;
+}
+.button{
+	-fx-background-radius: 20.0px;
+	-fx-background-color: #f2e8cd;
+}
+
+.list-container{
+	-fx-background-color: #fff;
+}
+
+#song-list{
+	-fx-background-color: #eee;
+}
+
+#modalCard{
+	-fx-background-color: #fff;
+}
+#modal-bg{
+	-fx-background-color: rgba(0, 0, 0, 0.5);
+
+}
+
+
+
