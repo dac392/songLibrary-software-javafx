@@ -124,7 +124,7 @@ public class SongLibController {
             		sortData();
             		
             		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-            		file.write("{songs: "+data+"}");
+            		file.write("{\"songs\": "+data+"}");
             		file.flush();
             		file.close();
 
@@ -135,9 +135,7 @@ public class SongLibController {
         			e.printStackTrace();
         		}
         		songsList.getSelectionModel().select(newIndex);
-        		 
-//        		data.put(song);
-//        		System.out.println(data.toString());
+        		
         		
         		
 
