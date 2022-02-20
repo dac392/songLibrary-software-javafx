@@ -141,54 +141,6 @@ public class SongLibController {
 	    		
 	    	}
     		else if(editing && song.canBeAdded(obsList)){
-
-            		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-            		file.write("{\"songs\": "+data+"}");
-            		file.flush();
-            		file.close();
-
-        		}catch(JSONException e) {
-        			e.printStackTrace();
-        		}
-        		catch(IOException e) {
-        			e.printStackTrace();
-        		}
-        		songsList.getSelectionModel().select(newIndex);
-        		
-        		
-        		
-
-    		}
-    	}
-    		else if(editing){
-        		Song song = new Song(songInfo.get(), obsList.size());
-
-    			try {
-    		        int a = songsList.getSelectionModel().getSelectedIndex();
-
-    				data.getJSONObject(a).put("title", song.getTitle());
-    				data.getJSONObject(a).put("artist", song.getArtist());
-    				data.getJSONObject(a).put("album", song.getAlbum());
-    				data.getJSONObject(a).put("year", song.getYear());
-    				
-    				editing = false;
-    				mode.setText("Editing a Song");
-    				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-            		file.write("{songs: "+data+"}");
-            		file.flush();
-            		file.close();
-            		sortData();
-            		obsList.set(a, song.toString());
-            		obsList.sort(null);
-            		songsList.setItems(obsList);
-            		titleLabel.setText(data.getJSONObject(a).getString("title"));
-            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
-            	    albumLabel.setText(data.getJSONObject(a).getString("album"));
-            	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
-            		exitModalView();
-            		formCleanUp();
-    			}catch(JSONException e) {
-    				e.printStackTrace();
     				
 	    			try {
 	    		        int a = songsList.getSelectionModel().getSelectedIndex();
