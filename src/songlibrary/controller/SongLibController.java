@@ -57,6 +57,8 @@ public class SongLibController {
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
     private JSONArray data; // might not be a JSONArray, might need something else
     private boolean editing = false;
+    private String oldTitle = "";
+    private String oldArtist = "";
    
     
     public void start(Stage mainStage) {
@@ -74,7 +76,7 @@ public class SongLibController {
 				Song a = new Song(b.optString("title"),b.optString("artist"),b.optString("album"),b.optString("year"), 0);
 				obsList.add(a.toString());
 			}
-			obsList.sort(null);
+			obsList.sort(String.CASE_INSENSITIVE_ORDER);
 			songsList.setItems(obsList);
 			
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
@@ -104,7 +106,7 @@ public class SongLibController {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(!editing && song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
-    				obsList.sort(null);
+    				obsList.sort(String.CASE_INSENSITIVE_ORDER);
     				songsList.setItems(obsList);
     				exitModalView();
     				formCleanUp();
@@ -140,7 +142,7 @@ public class SongLibController {
 	
 	    		
 	    	}
-    		else if(editing && song.canBeAdded(obsList)){
+    		else if(editing && song.canBeAdded(obsList, oldTitle, oldArtist)){
     				
 	    			try {
 	    		        int a = songsList.getSelectionModel().getSelectedIndex();
@@ -158,7 +160,7 @@ public class SongLibController {
 	            		file.close();
 	            		sortData();
 	            		obsList.set(a, song.toString());
-	            		obsList.sort(null);
+	            		obsList.sort(String.CASE_INSENSITIVE_ORDER);
 	            		songsList.setItems(obsList);
 	            		titleLabel.setText(data.getJSONObject(a).getString("title"));
 	            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
@@ -230,6 +232,8 @@ public class SongLibController {
     		artistText.setText(data.getJSONObject(a).getString("artist"));
     		albumText.setText(data.getJSONObject(a).getString("album"));
     		yearText.setText(data.getJSONObject(a).getString("year"));
+    		oldTitle = data.getJSONObject(a).getString("title");
+    		oldArtist = data.getJSONObject(a).getString("artist");
     		modalContainer.setVisible(true);
     		modalContainer.setOpacity(1);
     		editing = true;
