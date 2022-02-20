@@ -137,7 +137,7 @@ public class SongLibController {
 			
 			if(instruction == ADD) {
 				data.put(input);
-				sortData();			// i feel like this should go outside
+						// i feel like this should go outside
 			}
 			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
 			file.write("{\"songs\": "+data+"}");
@@ -150,6 +150,7 @@ public class SongLibController {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		sortData();	
     }
     private void editSong(Optional<String[]> songInfo) {
     	if(songInfo.isPresent()) {
@@ -199,6 +200,8 @@ public class SongLibController {
     			e.printStackTrace();
     			return false;
     		}
+    	}else {
+    		showAlert("Error","Empty list", "Cannot edit an empty list, please add a song first.");
     	}
     	// SHOULD PROBABLY SHOW A MESSAGE SAYING THAT YOU CAN'T EDIT IF YOU DON'T HAVE ANY SONGS
     	return false;
@@ -223,15 +226,22 @@ public class SongLibController {
     		{
     			data.remove(a);
     			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-    			file.write("{songs: "+data+"}");
+    			file.write("{\"songs\": "+data+"}");
     			file.flush();
     			file.close();  			
-    			sortData();
-        	obsList.sort(String.CASE_INSENSITIVE_ORDER);	
     			obsList.remove(a);
-    			songsList.setItems(obsList);
-
-    			
+    			if(a > 0) {
+    				sortData();
+    				obsList.sort(String.CASE_INSENSITIVE_ORDER);   
+    				
+    			}else {
+    				
+    				titleLabel.setText("unknown");
+    		    	artistLabel.setText("unknown");
+    		        albumLabel.setText("unknown");
+    		        releasedateLabel.setText("unknown");
+    			}
+    			songsList.setItems(obsList);	
     		}
     	
     	}catch(JSONException e) {
@@ -309,7 +319,7 @@ public class SongLibController {
     		modalContainer.setVisible(true);
         	modalContainer.setOpacity(1);
     		
-    	}else {
+    	}else if(!edit){
     		instruction = ADD;
     		mode.setText("Adding a Song");
     		modalContainer.setVisible(true);
@@ -365,6 +375,8 @@ public class SongLibController {
     				{
     					a = data.getJSONObject(j).optString("artist").toLowerCase();
        				 	b = data.getJSONObject(i).optString("artist").toLowerCase();
+       				 	
+       			
     				}
     				 
     				 if(a.compareTo(b)<0)
@@ -377,8 +389,16 @@ public class SongLibController {
     				}
     				if(a.compareTo(b) == 0)
     				{
-    					titleMatch = true;
+    					a = data.getJSONObject(j).optString("artist").toLowerCase();
+       				 	b = data.getJSONObject(i).optString("artist").toLowerCase();
+       				 	
+       				 if(a.compareTo(b)<0) {
+       				 	JSONObject temp = new JSONObject();
+       				 	temp = data.getJSONObject(i);
+ 						data.put(i, data.get(j));
+ 						data.put(j, temp);
     				}
+    			}
     			}catch(JSONException e) {
     				e.printStackTrace();
     			}
