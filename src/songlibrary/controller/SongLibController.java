@@ -173,6 +173,7 @@ public class SongLibController {
 	    	}
     	}
     }
+    
     private boolean fetchEditInfo() {
     	int a = songsList.getSelectionModel().getSelectedIndex();
     	if(a > -1) {
@@ -231,28 +232,6 @@ public class SongLibController {
     	}
     	
 
-    }
-
-    @FXML void editSong(ActionEvent event) {
-    	int a = songsList.getSelectionModel().getSelectedIndex();
-    	if(a > -1)
-    	{
-    		try {
-    		titleText.setText(data.getJSONObject(a).getString("title"));
-    		artistText.setText(data.getJSONObject(a).getString("artist"));
-    		albumText.setText(data.getJSONObject(a).getString("album"));
-    		yearText.setText(data.getJSONObject(a).getString("year"));
-    		oldTitle = data.getJSONObject(a).getString("title");
-    		oldArtist = data.getJSONObject(a).getString("artist");
-    		modalContainer.setVisible(true);
-    		modalContainer.setOpacity(1);
-    		editing = true;
-    		mode.setText("Editing a Song");
-    		}catch(JSONException e) {
-    			e.printStackTrace();
-    		}
-    	}
- 
     }
 
     
