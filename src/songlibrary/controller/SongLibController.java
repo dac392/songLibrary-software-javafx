@@ -105,7 +105,8 @@ public class SongLibController {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
-    				obsList.sort( Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
+    				obsList.sort(String.CASE_INSENSITIVE_ORDER);
+    				//obsList.sort( Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
     				songsList.setItems(obsList);
     				addToJson(song, null);
     				
@@ -154,7 +155,8 @@ public class SongLibController {
         		sortData();	// i think i can delete this.
         		
         		obsList.set(a, song.toString());
-        		obsList.sort(Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
+        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
+        		//obsList.sort(Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
         		songsList.setItems(obsList);
         		a = obsList.indexOf(song.toString());
         		titleLabel.setText(data.getJSONObject(a).getString("title"));
@@ -207,9 +209,13 @@ public class SongLibController {
     			file.write("{songs: "+data+"}");
     			file.flush();
     			file.close();
+    			
+    			sortData();
+        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
+        		
     			obsList.remove(a);
     			songsList.setItems(obsList);
-    			//songsList.getItems().remove(a);
+    			
     			
     		}
     	
