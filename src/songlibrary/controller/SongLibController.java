@@ -215,7 +215,6 @@ public class SongLibController {
 	@FXML void deleteSong(ActionEvent event) {
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
-    	
     	if(a > -1)
     	{
     	
@@ -233,16 +232,23 @@ public class SongLibController {
     			obsList.remove(a);
     			if(a > -1) {
     				sortData();
-    				obsList.sort(String.CASE_INSENSITIVE_ORDER);   
-    				
-    			}else {
+    				obsList.sort(String.CASE_INSENSITIVE_ORDER);      				
+    			}
+    		
+    			if(data.length() ==0) {
     				
     				titleLabel.setText("unknown");
     		    	artistLabel.setText("unknown");
     		        albumLabel.setText("unknown");
     		        releasedateLabel.setText("unknown");
     			}
-    			songsList.setItems(obsList);	
+    			
+    			
+    			if( (a+1) <= data.length() && a!=0)
+    			{
+    	    		songsList.getSelectionModel().selectNext();
+    			}
+    			songsList.setItems(obsList);
     		}
     	
     	}catch(JSONException e) {
