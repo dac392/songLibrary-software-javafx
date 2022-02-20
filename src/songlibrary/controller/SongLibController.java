@@ -230,7 +230,7 @@ public class SongLibController {
     			file.flush();
     			file.close();  			
     			obsList.remove(a);
-    			if(a > 0) {
+    			if(a > -1) {
     				sortData();
     				obsList.sort(String.CASE_INSENSITIVE_ORDER);   
     				
