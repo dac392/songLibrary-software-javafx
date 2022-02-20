@@ -146,10 +146,13 @@ public class SongLibController {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
-    				obsList.sort(String.CASE_INSENSITIVE_ORDER);
+    				try {
+    					obsList.sort(String.CASE_INSENSITIVE_ORDER);
+    				}catch(JSONException e) {
+    					System.err.println("UNEXPECTED: addSong");
+    				}
     				songsList.setItems(obsList);
     				addToJson(song, null);
-    				
     				int newIndex = obsList.indexOf(song.toString());
 	        		songsList.getSelectionModel().select(newIndex);
     				exitModalView();
@@ -194,15 +197,13 @@ public class SongLibController {
 	@FXML void deleteSong(ActionEvent event) {
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
-    	if(a > -1)
-    	{
+    	if(a > -1){
     	
     	try {
     		Alert warning = new Alert(AlertType.WARNING, "Deleting "+data.getJSONObject(a).getString("title")+" by "+data.getJSONObject(a).getString("artist")+ ". Are you sure?", ButtonType.OK, ButtonType.CANCEL);
     		warning.setTitle("WARNING");
     		Optional<ButtonType> answer = warning.showAndWait();
-    		if(answer.get() == ButtonType.OK)
-    		{
+    		if(answer.get() == ButtonType.OK){
     			data.remove(a);
     			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
     			file.write("{\"songs\": "+data+"}");
@@ -214,17 +215,15 @@ public class SongLibController {
     				obsList.sort(String.CASE_INSENSITIVE_ORDER);      				
     			}
     		
-    			if(data.length() ==0) {
+    			if(data.length() == 0) {
     				
     				titleLabel.setText("unknown");
     		    	artistLabel.setText("unknown");
     		        albumLabel.setText("unknown");
     		        releasedateLabel.setText("unknown");
     			}
-    			
-    			
-    			if( (a+1) <= data.length() && a!=0)
-    			{
+
+    			if( (a+1) <= data.length() && a!=0){
     	    		songsList.getSelectionModel().selectNext();
     			}
     			songsList.setItems(obsList);
@@ -239,26 +238,25 @@ public class SongLibController {
 
     }
     private void addToJson(Song song, JSONObject input) {
-		try {
-			if(input == null) {
-				input = new JSONObject();
-			}
-			input.put("title", song.getTitle());
-			input.put("artist", song.getArtist());
-			input.put("album", song.getAlbum());
-			input.put("year", song.getYear());
-			
-			if(instruction == ADD) {
-				data.put(input);
-				sortData();
-			}
+		if(input == null) {
+			input = new JSONObject();
+		}
+		input.put("title", song.getTitle());
+		input.put("artist", song.getArtist());
+		input.put("album", song.getAlbum());
+		input.put("year", song.getYear());
+		if(instruction == ADD) {
+			data.put(input);
+			sortData();
+		}
+    	try {
 			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
 			file.write("{\"songs\": "+data+"}");
 			file.flush();
 			file.close();
 		
 		}catch(Exception e) {
-			e.printStackTrace();
+			System.err.println("Unexpected result in addToJson");
 		}
 			
     }
