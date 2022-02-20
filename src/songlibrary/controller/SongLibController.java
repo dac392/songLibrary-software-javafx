@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -19,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Optional;
 
 import org.json.JSONArray;
@@ -56,9 +56,10 @@ public class SongLibController {
     @FXML private ListView<String> songsList;
     private ObservableList<String> obsList = FXCollections.observableArrayList(); 
     private JSONArray data; // might not be a JSONArray, might need something else
-    private boolean editing = false;
-    private String oldTitle = "";
-    private String oldArtist = "";
+    private int instruction = -1;
+    private final int ADD = 0;
+    private final int EDIT = 1;
+
    
     
     public void start(Stage mainStage) {
@@ -76,7 +77,9 @@ public class SongLibController {
 				Song a = new Song(b.optString("title"),b.optString("artist"),b.optString("album"),b.optString("year"), 0);
 				obsList.add(a.toString());
 			}
+
 			obsList.sort(String.CASE_INSENSITIVE_ORDER);
+			//obsList.sort(null);
 			songsList.setItems(obsList);
 			
 	    	System.out.println(data.toString());  // you can remove this, just used it for debuggin
@@ -104,87 +107,89 @@ public class SongLibController {
     	if(songInfo.isPresent()) { 
     	
     		Song song = new Song(songInfo.get(), obsList.size());
-    		if(!editing && song.canBeAdded(obsList)) {  			    			
+    		if(song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
     				obsList.sort(String.CASE_INSENSITIVE_ORDER);
+    				//obsList.sort( Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
     				songsList.setItems(obsList);
-    				exitModalView();
-    				formCleanUp();
-            	
-    				int newIndex = obsList.indexOf(song.toString());
-    				song.setListIndex(newIndex);
-        		
-        		
-        		//wrong
-    				try {
-    					JSONObject input = new JSONObject();
-    					input.put("title", song.getTitle());
-    					input.put("artist", song.getArtist());
-    					input.put("album", song.getAlbum());
-    					input.put("year", song.getYear());
-            		
-    					data.put(input);
-            		
-    					sortData();
-            		
-    					FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-    					file.write("{songs: "+data+"}");
-    					file.flush();
-    					file.close();
-            		
-	        		}catch(JSONException e) {
-	        			e.printStackTrace();
-	        		}
-	        		catch(IOException e) {
-	        			e.printStackTrace();
-	        		}
-	        		songsList.getSelectionModel().select(newIndex);		
-	
-	    		
-	    	}
-    		else if(editing && song.canBeAdded(obsList, oldTitle, oldArtist)){
+    				addToJson(song, null);
     				
-	    			try {
-	    		        int a = songsList.getSelectionModel().getSelectedIndex();
-	
-	    				data.getJSONObject(a).put("title", song.getTitle());
-	    				data.getJSONObject(a).put("artist", song.getArtist());
-	    				data.getJSONObject(a).put("album", song.getAlbum());
-	    				data.getJSONObject(a).put("year", song.getYear());
-	    				
-	    				editing = false;
-	    				mode.setText("Editing a Song");
-	    				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-	            		file.write("{songs: "+data+"}");
-	            		file.flush();
-	            		file.close();
-	            		sortData();
-	            		obsList.set(a, song.toString());
-	            		obsList.sort(String.CASE_INSENSITIVE_ORDER);
-	            		songsList.setItems(obsList);
-	            		titleLabel.setText(data.getJSONObject(a).getString("title"));
-	            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
-	            	    albumLabel.setText(data.getJSONObject(a).getString("album"));
-	            	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
-	            		exitModalView();
-	            		formCleanUp();
-	    			}catch(JSONException e) {
-	    				e.printStackTrace();
-	    				
-	    			}catch(IOException e) {
-	    				e.printStackTrace();
-	    			}
-    			
-    		}
-    		
-    		else {
-    		
-    			
+    				int newIndex = obsList.indexOf(song.toString());
+	        		songsList.getSelectionModel().select(newIndex);
+    				exitModalView();
+	    	}else {	
     			showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
         	}
     	}
 
+    }
+    private void addToJson(Song song, JSONObject input) {
+		try {
+			if(input == null) {
+				input = new JSONObject();
+			}
+			input.put("title", song.getTitle());
+			input.put("artist", song.getArtist());
+			input.put("album", song.getAlbum());
+			input.put("year", song.getYear());
+			
+			if(instruction == ADD) {
+				data.put(input);
+				sortData();			// i feel like this should go outside
+			}
+			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+			file.write("{\"songs\": "+data+"}");
+			file.flush();
+			file.close();
+		
+		}catch(JSONException e) {
+			e.printStackTrace();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+    }
+    private void editSong(Optional<String[]> songInfo) {
+    	if(songInfo.isPresent()) {
+	    	Song song = new Song(songInfo.get(), obsList.size());
+	    	if(song.canBeAdded(obsList)){
+	    		// what if you don't change the title/album what so ever?
+	    		int a = songsList.getSelectionModel().getSelectedIndex();
+	    		addToJson(song, data.getJSONObject(a));
+        		sortData();	// i think i can delete this.
+        		
+        		obsList.set(a, song.toString());
+        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
+        		//obsList.sort(Comparator.comparing((s1)->s1.split("\n")[0].toLowerCase()));
+        		songsList.setItems(obsList);
+        		a = obsList.indexOf(song.toString());
+        		titleLabel.setText(data.getJSONObject(a).getString("title"));
+        		artistLabel.setText(data.getJSONObject(a).getString("artist"));
+        	    albumLabel.setText(data.getJSONObject(a).getString("album"));
+        	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
+        		exitModalView();
+
+				songsList.getSelectionModel().select(a);	
+	    	}
     	}
+    }
+    private boolean fetchEditInfo() {
+    	int a = songsList.getSelectionModel().getSelectedIndex();
+    	if(a > -1) {
+    		try {
+	    		titleText.setText(data.getJSONObject(a).getString("title"));
+	    		artistText.setText(data.getJSONObject(a).getString("artist"));
+	    		albumText.setText(data.getJSONObject(a).getString("album"));
+	    		yearText.setText(data.getJSONObject(a).getString("year"));
+	    		return true;
+    		}catch(JSONException e) {
+    			e.printStackTrace();
+    			return false;
+    		}
+    	}
+    	// SHOULD PROBABLY SHOW A MESSAGE SAYING THAT YOU CAN'T EDIT IF YOU DON'T HAVE ANY SONGS
+    	return false;
+    }
     	
     	
     
@@ -207,11 +212,12 @@ public class SongLibController {
     			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
     			file.write("{songs: "+data+"}");
     			file.flush();
-    			file.close();
-    			songsList.getItems().remove(a);
+    			file.close();  			
     			sortData();
-        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
-        		songsList.setItems(obsList);
+        	obsList.sort(String.CASE_INSENSITIVE_ORDER);	
+    			obsList.remove(a);
+    			songsList.setItems(obsList);
+
     			
     		}
     	
@@ -248,6 +254,7 @@ public class SongLibController {
     	}
  
     }
+
     
     @FXML void submit(ActionEvent event) {
     	// event listener on submit button. 
@@ -262,7 +269,14 @@ public class SongLibController {
     	else {
     		String newSongInfo[] = {titleText.getText().strip(), artistText.getText().strip(), albumText.getText().strip(), yearText.getText().strip()};
     		songInformation = Optional.of(newSongInfo);
-    		addSong(songInformation);
+    		if(instruction == ADD) {
+    			addSong(songInformation);
+    		}else if(instruction == EDIT) {
+    			editSong(songInformation);
+    		}else {
+    			System.err.println("Warning: Instruction was not set");
+    		}
+    		
     	}
     	
     	
@@ -288,17 +302,29 @@ public class SongLibController {
 
     	modalContainer.setVisible(false);
     	modalContainer.setOpacity(0);
+    	instruction = -1;
     	formCleanUp();
-    	editing = false;
-    	mode.setText("Adding a Song");
     	
     }
      
     @FXML
-    void showModalView() {
+    void showModalView(ActionEvent event) {
         // set this as an event listener for add button
-    	modalContainer.setVisible(true);
-    	modalContainer.setOpacity(1);
+    	boolean edit = event.getTarget().toString().contains("Edit");
+    	instruction = (edit)? EDIT : ADD;
+    	if(edit && fetchEditInfo()) {
+    		instruction = EDIT;
+    		mode.setText("Editing a Song");
+    		modalContainer.setVisible(true);
+        	modalContainer.setOpacity(1);
+    		
+    	}else {
+    		instruction = ADD;
+    		mode.setText("Adding a Song");
+    		modalContainer.setVisible(true);
+        	modalContainer.setOpacity(1);
+    	}
+    	
     }
 
 	private void select(Stage mainStage) {		//reminder, there might be a bug here             
@@ -309,17 +335,14 @@ public class SongLibController {
         
 		if(song != null) {
 			try {
-			String info[] = song.split(" ");
-	    	titleLabel.setText(data.getJSONObject(a).getString("title"));
-	    	artistLabel.setText(data.getJSONObject(a).getString("artist"));
-	        albumLabel.setText(data.getJSONObject(a).getString("album"));
-	        releasedateLabel.setText(data.getJSONObject(a).getString("year"));
+		    	titleLabel.setText(data.getJSONObject(a).getString("title"));
+		    	artistLabel.setText(data.getJSONObject(a).getString("artist"));
+		        albumLabel.setText(data.getJSONObject(a).getString("album"));
+		        releasedateLabel.setText(data.getJSONObject(a).getString("year"));
 			}catch (JSONException e) {
 				e.printStackTrace();
 			}
-		}
-		
-	
+		}	
 
 
 	}
@@ -331,14 +354,6 @@ public class SongLibController {
         albumText.clear();
         yearText.clear();
        
-    }
-    
-    private void debugAdd(Song test) {
-        // just print statements. not important. delete if you'd like
-    	System.out.println(test.getTitle());
-    	System.out.println(test.getArtist());
-    	System.out.println(test.getAlbum());
-    	System.out.println(test.getYear());
     }
     
     private void sortData() {

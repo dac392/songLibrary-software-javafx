@@ -26,9 +26,7 @@ public class Song {
 		if(!year.equals("")&&! year.toLowerCase().equals("unknown") )
 		{
 			int y = Integer.parseInt(year);
-		
 			this.year = (y > 0)? year : "unknown";
-		
 			this.setListIndex(listIndex);
 		}
 	}
@@ -95,16 +93,16 @@ public class Song {
 		//if(b.length() > 15)
 			//b = b.substring(0,12) + "...";
 		
-		String c = this.getAlbum();
+		//String c = this.getAlbum();
 		//if(c.length() > 15)
 			//c = c.substring(0,12) + "...";
 		
-		String d = this.getYear();
+		//String d = this.getYear();
 		//if(d.length() > 15)
 			//d = d.substring(0,12) + "...";
 		
 		
-		return ("Song: "+a+"\nArtist: "+b+"\nAlbum: "+c+"\nYear: "+d+"\n");
+		return (a+"\n"+b);
 	}
 
 	public int getListIndex() {
@@ -119,15 +117,11 @@ public class Song {
 	public boolean canBeAdded(ObservableList<String> obslist) {
 		if(obslist.size()>0) {
 			
-			String songTitle = "song: "+this.title.toLowerCase();
-			String songArtist = "artist: "+this.artist.toLowerCase();
-			
-			
+			String songTitle = this.title.toLowerCase();
+			String songArtist = this.artist.toLowerCase();
 			for(int i = 0; i < obslist.size(); i++) {
 				String element = obslist.get(i);
 				String songInList[] = element.toLowerCase().split("\n");
-			
-				
 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
 					return false;
 				}
@@ -138,29 +132,22 @@ public class Song {
 		return true;
 	}
 	
-	public boolean canBeAdded(ObservableList<String> obslist, String oldTitle, String oldArtist) {
-		if(this.title.toLowerCase().equals(oldTitle.toLowerCase()) && this.artist.toLowerCase().equals(oldArtist.toLowerCase()))
-			return true;
-		if(obslist.size()>0) {
-			
-			String songTitle = "song: "+this.title.toLowerCase();
-			String songArtist = "artist: "+this.artist.toLowerCase();
-			
-			
-			for(int i = 0; i < obslist.size(); i++) {
-				String element = obslist.get(i);
-				String songInList[] = element.toLowerCase().split("\n");
-			
-				
-				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
-					return false;
-				}
-				
-			}
-		}
-
-		return true;
-	}
+// 	public boolean canBeAdded(ObservableList<String> obslist, String oldTitle, String oldArtist) {
+// 		if(this.title.toLowerCase().equals(oldTitle.toLowerCase()) && this.artist.toLowerCase().equals(oldArtist.toLowerCase()))
+// 			return true;
+// 		if(obslist.size()>0) {
+// 			String songTitle = this.title.toLowerCase();
+// 			String songArtist = this.artist.toLowerCase();
+// 			for(int i = 0; i < obslist.size(); i++) {
+// 				String element = obslist.get(i);
+// 				String songInList[] = element.toLowerCase().split("\n");
+// 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
+// 					return false;
+// 				}			
+// 			}
+// 		}
+// 		return true;
+// 	}
 	
 	private int intChecker(String potentialNum) {
 		int d = 0;
@@ -171,6 +158,6 @@ public class Song {
 			}
 		}
 		return d;
-		
 	}
+
 }
