@@ -59,6 +59,8 @@ public class SongLibController {
     private int instruction = -1;
     private final int ADD = 0;
     private final int EDIT = 1;
+    private String oldTitle ="";
+    private String oldArtist="";
 
    
     
@@ -151,9 +153,12 @@ public class SongLibController {
     }
     private void editSong(Optional<String[]> songInfo) {
     	if(songInfo.isPresent()) {
+        	
+
 	    	Song song = new Song(songInfo.get(), obsList.size());
-	    	if(song.canBeAdded(obsList)){
+	    	if(song.canBeAdded(obsList, oldTitle, oldArtist)){
 	    		// what if you don't change the title/album what so ever?
+	    		try {
 	    		int a = songsList.getSelectionModel().getSelectedIndex();
 	    		addToJson(song, data.getJSONObject(a));
         		sortData();	// i think i can delete this.
@@ -170,6 +175,11 @@ public class SongLibController {
         		exitModalView();
 
 				songsList.getSelectionModel().select(a);	
+	    		}catch(JSONException e) {
+	    			e.printStackTrace();
+	    		}
+	    	}else {	
+				showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
 	    	}
     	}
     }
@@ -182,6 +192,8 @@ public class SongLibController {
 	    		artistText.setText(data.getJSONObject(a).getString("artist"));
 	    		albumText.setText(data.getJSONObject(a).getString("album"));
 	    		yearText.setText(data.getJSONObject(a).getString("year"));
+	    		oldTitle = data.getJSONObject(a).getString("title");
+	    		oldArtist = data.getJSONObject(a).getString("artist");
 	    		return true;
     		}catch(JSONException e) {
     			e.printStackTrace();
