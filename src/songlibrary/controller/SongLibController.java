@@ -59,6 +59,7 @@ public class SongLibController {
     private int instruction = -1;
     private final int ADD = 0;
     private final int EDIT = 1;
+
    
     
     public void start(Stage mainStage) {
@@ -76,6 +77,8 @@ public class SongLibController {
 				Song a = new Song(b.optString("title"),b.optString("artist"),b.optString("album"),b.optString("year"), 0);
 				obsList.add(a.toString());
 			}
+
+			obsList.sort(String.CASE_INSENSITIVE_ORDER);
 			//obsList.sort(null);
 			songsList.setItems(obsList);
 			
@@ -85,7 +88,8 @@ public class SongLibController {
 	    	.getSelectionModel()
 			.selectedIndexProperty()
 			.addListener( (obs, oldVal, newVal) -> select(mainStage));
-	    	songsList.getSelectionModel().select(0);
+	    	if(data.length() > 0)
+	    		songsList.getSelectionModel().select(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Sorry, this is not a valid location");
@@ -195,7 +199,7 @@ public class SongLibController {
     	
     	int a = songsList.getSelectionModel().getSelectedIndex();
     	
-    	if(a > -1 && songsList.getItems().size() > 1)
+    	if(a > -1)
     	{
     	
     	try {
@@ -208,14 +212,12 @@ public class SongLibController {
     			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
     			file.write("{songs: "+data+"}");
     			file.flush();
-    			file.close();
-    			
+    			file.close();  			
     			sortData();
-        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
-        		
+        	obsList.sort(String.CASE_INSENSITIVE_ORDER);	
     			obsList.remove(a);
     			songsList.setItems(obsList);
-    			
+
     			
     		}
     	
@@ -228,10 +230,31 @@ public class SongLibController {
     	
     	}
     	
-    	else {	
-    		showAlert("Error!", "Cannot Delete!", "The list of songs needs at least one song!");
-    	}
+
     }
+
+    @FXML void editSong(ActionEvent event) {
+    	int a = songsList.getSelectionModel().getSelectedIndex();
+    	if(a > -1)
+    	{
+    		try {
+    		titleText.setText(data.getJSONObject(a).getString("title"));
+    		artistText.setText(data.getJSONObject(a).getString("artist"));
+    		albumText.setText(data.getJSONObject(a).getString("album"));
+    		yearText.setText(data.getJSONObject(a).getString("year"));
+    		oldTitle = data.getJSONObject(a).getString("title");
+    		oldArtist = data.getJSONObject(a).getString("artist");
+    		modalContainer.setVisible(true);
+    		modalContainer.setOpacity(1);
+    		editing = true;
+    		mode.setText("Editing a Song");
+    		}catch(JSONException e) {
+    			e.printStackTrace();
+    		}
+    	}
+ 
+    }
+
     
     @FXML void submit(ActionEvent event) {
     	// event listener on submit button. 
