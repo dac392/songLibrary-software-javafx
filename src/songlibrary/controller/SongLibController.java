@@ -178,6 +178,8 @@ public class SongLibController {
 	    		}catch(JSONException e) {
 	    			e.printStackTrace();
 	    		}
+	    	}else {	
+				showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
 	    	}
     	}
     }
