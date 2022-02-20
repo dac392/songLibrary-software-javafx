@@ -209,6 +209,10 @@ public class SongLibController {
     			file.flush();
     			file.close();
     			songsList.getItems().remove(a);
+    			sortData();
+        		obsList.sort(String.CASE_INSENSITIVE_ORDER);
+        		songsList.setItems(obsList);
+    			
     		}
     	
     	}catch(JSONException e) {
