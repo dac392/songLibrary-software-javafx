@@ -137,7 +137,7 @@ public class SongLibController {
 			
 			if(instruction == ADD) {
 				data.put(input);
-				sortData();			// i feel like this should go outside
+						// i feel like this should go outside
 			}
 			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
 			file.write("{\"songs\": "+data+"}");
@@ -150,6 +150,7 @@ public class SongLibController {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		sortData();	
     }
     private void editSong(Optional<String[]> songInfo) {
     	if(songInfo.isPresent()) {
@@ -229,7 +230,7 @@ public class SongLibController {
     			file.flush();
     			file.close();  			
     			obsList.remove(a);
-    			if(a > 0) {
+    			if(a > -1) {
     				sortData();
     				obsList.sort(String.CASE_INSENSITIVE_ORDER);   
     				
@@ -374,6 +375,8 @@ public class SongLibController {
     				{
     					a = data.getJSONObject(j).optString("artist").toLowerCase();
        				 	b = data.getJSONObject(i).optString("artist").toLowerCase();
+       				 	
+       			
     				}
     				 
     				 if(a.compareTo(b)<0)
@@ -386,8 +389,16 @@ public class SongLibController {
     				}
     				if(a.compareTo(b) == 0)
     				{
-    					titleMatch = true;
+    					a = data.getJSONObject(j).optString("artist").toLowerCase();
+       				 	b = data.getJSONObject(i).optString("artist").toLowerCase();
+       				 	
+       				 if(a.compareTo(b)<0) {
+       				 	JSONObject temp = new JSONObject();
+       				 	temp = data.getJSONObject(i);
+ 						data.put(i, data.get(j));
+ 						data.put(j, temp);
     				}
+    			}
     			}catch(JSONException e) {
     				e.printStackTrace();
     			}
