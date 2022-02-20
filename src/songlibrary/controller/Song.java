@@ -132,22 +132,22 @@ public class Song {
 		return true;
 	}
 	
-// 	public boolean canBeAdded(ObservableList<String> obslist, String oldTitle, String oldArtist) {
-// 		if(this.title.toLowerCase().equals(oldTitle.toLowerCase()) && this.artist.toLowerCase().equals(oldArtist.toLowerCase()))
-// 			return true;
-// 		if(obslist.size()>0) {
-// 			String songTitle = this.title.toLowerCase();
-// 			String songArtist = this.artist.toLowerCase();
-// 			for(int i = 0; i < obslist.size(); i++) {
-// 				String element = obslist.get(i);
-// 				String songInList[] = element.toLowerCase().split("\n");
-// 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
-// 					return false;
-// 				}			
-// 			}
-// 		}
-// 		return true;
-// 	}
+ 	public boolean canBeAdded(ObservableList<String> obslist, String oldTitle, String oldArtist) {
+ 		if(this.title.toLowerCase().equals(oldTitle.toLowerCase()) && this.artist.toLowerCase().equals(oldArtist.toLowerCase()))
+ 			return true;
+ 		if(obslist.size()>0) {
+ 			String songTitle = this.title.toLowerCase();
+ 			String songArtist = this.artist.toLowerCase();
+ 			for(int i = 0; i < obslist.size(); i++) {
+ 				String element = obslist.get(i);
+ 				String songInList[] = element.toLowerCase().split("\n");
+ 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
+ 					return false;
+ 				}			
+ 			}
+ 		}
+ 		return true;
+ 	}
 	
 	private int intChecker(String potentialNum) {
 		int d = 0;
