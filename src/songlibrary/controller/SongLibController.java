@@ -137,6 +137,7 @@ public class SongLibController {
 			
 			if(instruction == ADD) {
 				data.put(input);
+				sortData();
 						// i feel like this should go outside
 			}
 			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
@@ -150,7 +151,7 @@ public class SongLibController {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
-		sortData();	
+			
     }
     private void editSong(Optional<String[]> songInfo) {
     	if(songInfo.isPresent()) {
@@ -260,7 +261,7 @@ public class SongLibController {
     @FXML void submit(ActionEvent event) {
     	// event listener on submit button. 
     	Optional<String[]> songInformation = Optional.empty();
-    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty()){
+    	if(titleText.getText().isEmpty()  || artistText.getText().isEmpty() || titleText.getText().trim().length() == 0 || artistText.getText().trim().length()==0){
     		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
     	}
     	
@@ -404,6 +405,8 @@ public class SongLibController {
     			}
     		}
     	}
+    	
+   
     }
 
 }
