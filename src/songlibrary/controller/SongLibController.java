@@ -98,91 +98,89 @@ public class SongLibController {
     
     private void addSong(Optional<String[]> songInfo) {
         // This function no longer an event listenter. it gets called from submit
-    	if(songInfo.isPresent() && !editing) {
+    	if(songInfo.isPresent()) { 
+    	
     		Song song = new Song(songInfo.get(), obsList.size());
-    		if(song.canBeAdded(obsList)) {
-    			obsList.add(song.toString());
-    			obsList.sort(null);
-    			songsList.setItems(obsList);
-        		exitModalView();
-            	formCleanUp();
+    		if(!editing && song.canBeAdded(obsList)) {  			    			
+    				System.out.println(song.canBeAdded(obsList));
+    				obsList.add(song.toString());
+    				obsList.sort(null);
+    				songsList.setItems(obsList);
+    				exitModalView();
+    				formCleanUp();
             	
-        		int newIndex = obsList.indexOf(song.toString());
-        		song.setListIndex(newIndex);
+    				int newIndex = obsList.indexOf(song.toString());
+    				song.setListIndex(newIndex);
         		
         		
         		//wrong
-        		try {
-        			JSONObject input = new JSONObject();
-            		input.put("title", song.getTitle());
-            		input.put("artist", song.getArtist());
-            		input.put("album", song.getAlbum());
-            		input.put("year", song.getYear());
+    				try {
+    					JSONObject input = new JSONObject();
+    					input.put("title", song.getTitle());
+    					input.put("artist", song.getArtist());
+    					input.put("album", song.getAlbum());
+    					input.put("year", song.getYear());
             		
-            		data.put(input);
+    					data.put(input);
             		
-            		sortData();
+    					sortData();
             		
-            		FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-            		file.write("{songs: "+data+"}");
-            		file.flush();
-            		file.close();
-
-        		}catch(JSONException e) {
-        			e.printStackTrace();
-        		}
-        		catch(IOException e) {
-        			e.printStackTrace();
-        		}
-        		songsList.getSelectionModel().select(newIndex);
-        		 
-//        		data.put(song);
-//        		System.out.println(data.toString());
-        		
-        		
-
-    		}
-    	}
-    		else if(editing){
-        		Song song = new Song(songInfo.get(), obsList.size());
-
-    			try {
-    		        int a = songsList.getSelectionModel().getSelectedIndex();
-
-    				data.getJSONObject(a).put("title", song.getTitle());
-    				data.getJSONObject(a).put("artist", song.getArtist());
-    				data.getJSONObject(a).put("album", song.getAlbum());
-    				data.getJSONObject(a).put("year", song.getYear());
+    					FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+    					file.write("{songs: "+data+"}");
+    					file.flush();
+    					file.close();
+            		
+	        		}catch(JSONException e) {
+	        			e.printStackTrace();
+	        		}
+	        		catch(IOException e) {
+	        			e.printStackTrace();
+	        		}
+	        		songsList.getSelectionModel().select(newIndex);		
+	
+	    		
+	    	}
+    		else if(editing && song.canBeAdded(obsList)){
     				
-    				editing = false;
-    				mode.setText("Editing a Song");
-    				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-            		file.write("{songs: "+data+"}");
-            		file.flush();
-            		file.close();
-            		sortData();
-            		obsList.set(a, song.toString());
-            		obsList.sort(null);
-            		songsList.setItems(obsList);
-            		titleLabel.setText(data.getJSONObject(a).getString("title"));
-            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
-            	    albumLabel.setText(data.getJSONObject(a).getString("album"));
-            	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
-            		exitModalView();
-            		formCleanUp();
-    			}catch(JSONException e) {
-    				e.printStackTrace();
-    				
-    			}catch(IOException e) {
-    				e.printStackTrace();
-    			}
+	    			try {
+	    		        int a = songsList.getSelectionModel().getSelectedIndex();
+	
+	    				data.getJSONObject(a).put("title", song.getTitle());
+	    				data.getJSONObject(a).put("artist", song.getArtist());
+	    				data.getJSONObject(a).put("album", song.getAlbum());
+	    				data.getJSONObject(a).put("year", song.getYear());
+	    				
+	    				editing = false;
+	    				mode.setText("Editing a Song");
+	    				FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+	            		file.write("{songs: "+data+"}");
+	            		file.flush();
+	            		file.close();
+	            		sortData();
+	            		obsList.set(a, song.toString());
+	            		obsList.sort(null);
+	            		songsList.setItems(obsList);
+	            		titleLabel.setText(data.getJSONObject(a).getString("title"));
+	            		artistLabel.setText(data.getJSONObject(a).getString("artist"));
+	            	    albumLabel.setText(data.getJSONObject(a).getString("album"));
+	            	    releasedateLabel.setText(data.getJSONObject(a).getString("year"));
+	            		exitModalView();
+	            		formCleanUp();
+	    			}catch(JSONException e) {
+	    				e.printStackTrace();
+	    				
+	    			}catch(IOException e) {
+	    				e.printStackTrace();
+	    			}
     			
-    		}else {
+    		}
     		
+    		else {
     		
+    			
     			showAlert("Error!", "Duplicate song found", "Cannot add the same song more than once.");
         	}
-    		
+    	}
 
     	}
     	
@@ -252,7 +250,7 @@ public class SongLibController {
     		showAlert("Error!", "Title or Artist missing", "Song and artist name required to add a song.");
     	}
     	
-    	else if(!yearText.getText().isEmpty() && !yearText.getText().matches("[0-9]+")) {
+    	else if( (!yearText.getText().isEmpty() && !yearText.getText().equals("unknown")) && !yearText.getText().matches("[0-9]+")) {
     		showAlert("Error!", "Invalid Year!", "Please enter a valid year.");
     	}
     	else {
@@ -338,18 +336,36 @@ public class SongLibController {
     }
     
     private void sortData() {
+    	boolean titleMatch = false;
+    	String a;
+    	String b;
     	for(int i = 0; i < data.length(); i++)
     	{
     		for(int j = i+1; j < data.length(); j++)
     		{
     			try {
-    			if(data.getJSONObject(j).optString("title").compareTo(data.getJSONObject(i).optString("title"))<0)
+    				if(!titleMatch)
     				{
-    					JSONObject temp = new JSONObject();
-    					temp = data.getJSONObject(i);
-    					data.put(i, data.get(j));
-    					data.put(j, temp);
+    					a = data.getJSONObject(j).optString("title").toLowerCase();
+       				 	b = data.getJSONObject(i).optString("title").toLowerCase();
+    				}
+    				else
+    				{
+    					a = data.getJSONObject(j).optString("artist").toLowerCase();
+       				 	b = data.getJSONObject(i).optString("artist").toLowerCase();
+    				}
+    				 
+    				 if(a.compareTo(b)<0)
+    				 {
+	    					JSONObject temp = new JSONObject();
+	    					temp = data.getJSONObject(i);
+	    					data.put(i, data.get(j));
+	    					data.put(j, temp);
     				
+    				}
+    				if(a.compareTo(b) == 0)
+    				{
+    					titleMatch = true;
     				}
     			}catch(JSONException e) {
     				e.printStackTrace();

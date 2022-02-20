@@ -118,15 +118,22 @@ public class Song {
 
 	public boolean canBeAdded(ObservableList<String> obslist) {
 		if(obslist.size()>0) {
-			String songTitle = this.title.toLowerCase();
-			String songArtist = this.artist.toLowerCase();
+			
+			String songTitle = "song: "+this.title.toLowerCase();
+			String songArtist = "artist: "+this.artist.toLowerCase();
+			
 			
 			for(int i = 0; i < obslist.size(); i++) {
 				String element = obslist.get(i);
-				String songInList[] = element.toLowerCase().split(" ");
+				String songInList[] = element.toLowerCase().split("\n");
+				
+				System.out.println(songInList[0] +" = "+songTitle);
+				System.out.println(songInList[1] +" = "+songArtist);
+				
 				if( songInList[0].equals(songTitle) && songInList[1].equals(songArtist)) {
 					return false;
 				}
+				
 			}
 		}
 
