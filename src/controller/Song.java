@@ -1,4 +1,5 @@
-package songlibrary.controller;
+package controller;
+
 
 import javafx.collections.ObservableList;
 
@@ -83,26 +84,9 @@ public class Song {
 		
 	}
 	public String toString() {
-		
-		String a = this.getTitle();
-		
-		//if(a.length() > 15)
-		//	a = a.substring(0,12) + "...";
-		
-		String b = this.getArtist();
-		//if(b.length() > 15)
-			//b = b.substring(0,12) + "...";
-		
-		//String c = this.getAlbum();
-		//if(c.length() > 15)
-			//c = c.substring(0,12) + "...";
-		
-		//String d = this.getYear();
-		//if(d.length() > 15)
-			//d = d.substring(0,12) + "...";
-		
-		
-		return (a+"\n"+b);
+		String song = this.getTitle();	
+		String artist = this.getArtist();
+		return (song+"\n"+artist);
 	}
 
 	public int getListIndex() {

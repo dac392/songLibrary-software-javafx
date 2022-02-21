@@ -1,4 +1,5 @@
-package songlibrary.controller;
+package controller;
+
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -66,7 +67,7 @@ public class SongLibController {
     	// will do some basic set up before the program starts
     	
 		try {
-			String location = "src/songlibrary/controller/listData.json";
+			String location = "src/controller/listData.json";
 			String jsonString = new String(Files.readAllBytes(Paths.get(location)));
 			JSONObject parser = new JSONObject(jsonString);
 			data = parser.getJSONArray("songs");
@@ -205,7 +206,7 @@ public class SongLibController {
     		Optional<ButtonType> answer = warning.showAndWait();
     		if(answer.get() == ButtonType.OK){
     			data.remove(a);
-    			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+    			FileWriter file = new FileWriter("src/controller/listData.json");
     			file.write("{\"songs\": "+data+"}");
     			file.flush();
     			file.close();  			
@@ -250,7 +251,7 @@ public class SongLibController {
 			sortData();
 		}
     	try {
-			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+			FileWriter file = new FileWriter("src/controller/listData.json");
 			file.write("{\"songs\": "+data+"}");
 			file.flush();
 			file.close();
