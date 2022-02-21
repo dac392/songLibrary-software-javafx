@@ -1,12 +1,12 @@
-package songlibrary.main;
+package main;
 
+import controller.SongLibController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import songlibrary.controller.SongLibController;
 
 public class SongLib extends Application{
 
@@ -18,7 +18,7 @@ public class SongLib extends Application{
 	public void start(Stage primaryStage){
 		try {		
 			FXMLLoader loader = new FXMLLoader();   
-			loader.setLocation(getClass().getResource("/songlibrary/views/SongLibrary.fxml"));
+			loader.setLocation(getClass().getResource("/views/SongLibrary.fxml"));
 			
 			// load the fxml
 			AnchorPane root = (AnchorPane)loader.load();
