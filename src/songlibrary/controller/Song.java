@@ -1,3 +1,8 @@
+/**
+ * Song Library
+ * Abid Azad
+ * Diego Castellanos
+ * */
 package songlibrary.controller;
 
 import javafx.collections.ObservableList;

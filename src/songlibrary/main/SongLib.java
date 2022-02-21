@@ -1,3 +1,8 @@
+/**
+ * Song Library
+ * Abid Azad
+ * Diego Castellanos
+ * */
 package songlibrary.main;
 
 import javafx.application.Application;
