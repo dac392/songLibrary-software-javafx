@@ -257,14 +257,14 @@ public class SongLibController {
     			data.put(input);
     			sortData();
     		}    		
-			FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
-			file.write("{\"songs\": "+data+"}");
-			file.flush();
-			file.close();
+			  FileWriter file = new FileWriter("src/songlibrary/controller/listData.json");
+			  file.write("{\"songs\": "+data+"}");
+			  file.flush();
+			  file.close();
 		
-		}catch(Exception e) {
-			System.err.println("Unexpected result in addToJson");
-		}
+		  }catch(Exception e) {
+			  System.err.println("Unexpected result in addToJson");
+		  }
 			
     }
     
@@ -288,8 +288,6 @@ public class SongLibController {
     	}
     	return false;
     }
-
-
 
 	private void select(Stage mainStage) {
         String song = songsList.getSelectionModel().getSelectedItem();
