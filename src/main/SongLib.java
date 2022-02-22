@@ -1,3 +1,5 @@
+// Diego Castellanos dac392
+// Abid Azad aa2177
 package main;
 
 import controller.SongLibController;
@@ -19,12 +21,9 @@ public class SongLib extends Application{
 		try {		
 			FXMLLoader loader = new FXMLLoader();   
 			loader.setLocation(getClass().getResource("/views/SongLibrary.fxml"));
-			
-			// load the fxml
+
 			AnchorPane root = (AnchorPane)loader.load();
 
-			// get the controller (Do NOT create a new Controller()!!)
-			// instead, get it through the loader
 			SongLibController listController = loader.getController();
 			listController.start(primaryStage);
 		

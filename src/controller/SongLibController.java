@@ -1,3 +1,5 @@
+// Diego Castellanos dac392
+// Abid Azad aa2177
 package controller;
 
 
@@ -147,11 +149,9 @@ public class SongLibController {
     		Song song = new Song(songInfo.get(), obsList.size());
     		if(song.canBeAdded(obsList)) {  			    			
     				obsList.add(song.toString());
-    				try {
-    					obsList.sort(String.CASE_INSENSITIVE_ORDER);
-    				}catch(JSONException e) {
-    					System.err.println("UNEXPECTED: addSong");
-    				}
+    				
+    				obsList.sort(String.CASE_INSENSITIVE_ORDER);
+    				
     				songsList.setItems(obsList);
     				addToJson(song, null);
     				int newIndex = obsList.indexOf(song.toString());
